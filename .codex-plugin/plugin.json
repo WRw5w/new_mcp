@@ -1,0 +1,21 @@
+{
+  "name": "aic-leaderboard",
+  "description": "Safe, portable queue and browser control for AIC competition submissions.",
+  "version": "0.1.0",
+  "author": {"name": "local"},
+  "license": "MIT",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "AIC Leaderboard Control",
+    "shortDescription": "Queue and check AIC competition submissions",
+    "longDescription": "Validate AIC result archives, manage a durable submission queue, control a dedicated local Chrome session, and collect leaderboard evidence.",
+    "developerName": "WRw5w",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Check my AIC submission queue and remaining quota.",
+      "Validate an AIC result archive and prepare a submission."
+    ]
+  }
+}

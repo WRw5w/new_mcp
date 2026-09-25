@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aic-leaderboard": {
+      "command": "python",
+      "args": ["-m", "aic_leaderboard.mcp"]
+    }
+  }
+}
