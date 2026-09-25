@@ -14,3 +14,6 @@ cdp_probe_result.txt
 *.rar
 .env
 .env.*
+migration/private_build/
+migration/archives/*
+!migration/archives/*-final.aicenc

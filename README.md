@@ -69,3 +69,10 @@ ZIP's SHA-256. If the download or hash check is unavailable, it reports the
 visible result but leaves score attribution pending for manual verification.
 The legacy CDP backend still captures public leaderboard snapshots under
 `leaderboard_evidence/`.
+
+## Task migration archive
+
+The WorkBuddy `00001` conversation and the `jinyinsai1` task snapshot are
+documented in [migration/README.md](migration/README.md). The readable dialogue
+is public; the raw session and full project backup are encrypted, with the key
+kept outside this repository.
