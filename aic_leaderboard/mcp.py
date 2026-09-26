@@ -41,6 +41,13 @@ def _last_json_object(text):
 def main():
     q = Queue(ROOT)
     for line in sys.stdin:
+        # Rebind before parsing.  `req` only comes into existence once json.loads
+        # succeeds, and a loop variable survives into the next iteration, so
+        # without this a malformed line does one of two bad things: on the first
+        # message `req` is unbound and the handler's own NameError kills the
+        # server, and afterwards the error is reported under the *previous*
+        # request's id, which is a response the client never asked for.
+        req = None
         try:
             req = json.loads(line); method = req.get("method"); args = req.get("params", {}) or {}; i = req.get("id")
             if method == "initialize": reply(i, {"protocolVersion":"2024-11-05", "capabilities":{"tools":{}}, "serverInfo":{"name":"aic-leaderboard","version":"0.1.0"}})
@@ -89,7 +96,12 @@ def main():
                     if a.get("confirm_real_submit") is not True: raise ValueError("explicit confirm_real_submit=true is required")
                     candidate_id = str(a.get("id", ""))
                     if not candidate_id: raise ValueError("candidate id is required")
-                    proc = subprocess.run([sys.executable, "-m", "aic_leaderboard.cli", "--root", ROOT,
+                    # `text=True` decodes the child with THIS process's encoding, and the
+                    # CLI prints Chinese package paths, so both ends have to agree on
+                    # UTF-8.  Starting the child without -X utf8 makes it emit cp936 on
+                    # Windows, which then fails to decode here and leaves proc.stdout
+                    # None -- an exception, not a message the caller can read.
+                    proc = subprocess.run([sys.executable, "-X", "utf8", "-m", "aic_leaderboard.cli", "--root", ROOT,
                                            "submit", "--id", candidate_id, "--confirm-real-submit"],
                                           capture_output=True, text=True, env=os.environ.copy())
                     if proc.returncode: raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "submission failed")
