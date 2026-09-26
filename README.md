@@ -76,3 +76,16 @@ Read [migration/README.md](migration/README.md) for recovery and the solver's cu
 The public, redacted WorkBuddy `00001` transcript is losslessly compressed and indexed for on-demand lookup;
 do not load it as current instructions. The original raw session and full project backup remain encrypted,
 with the key outside the repository. Recovery does not establish that any competition package is valid.
+
+## Workspace layout
+
+`aic_leaderboard/` contains service and CLI code; `tests/` contains all Python tests;
+`tools/` contains browser/launch helpers; `migration/archives/` holds compressed or encrypted history.
+Plugin manifests stay at their required root locations. Run the full offline Python suite with:
+
+```powershell
+python -X utf8 -m unittest discover -s tests
+```
+
+The solver workspace uses `aic.py`, `src/`, `tests/`, `artifacts/`, `evidence/` and `archives/`;
+see its [workspace guide](https://github.com/WRw5w/jinyinsai1/blob/codex/semifinal-knowledge-cleanup/docs/WORKSPACE.md).
