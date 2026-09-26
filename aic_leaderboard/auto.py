@@ -35,7 +35,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -588,6 +588,26 @@ def cmd_submit(args: argparse.Namespace) -> int:
     })
     report["ledger"] = entry
     say("ledger", f"recorded status={status} score={(row or {}).get('score')}")
+
+    # Close the queue item.  Nothing else did, so it sat at `accepted` for ever --
+    # and `accepted` is in core.BLOCKING, which means ONE scored submission blocks
+    # every later one.  The 2026-09-26 15:45 submission did exactly that: the
+    # queue read `blocked` afterwards and the next submission would have been
+    # refused, while the ledger and the platform both already had the result.
+    # `scored` once a score is attributed, `awaiting_score` while it is not --
+    # the latter stays blocking on purpose, the former must not.
+    if not args.dry_run and status == "accepted":
+        state = queue.read()
+        for entry in state["queue"]:
+            if entry.get("id") == item["id"]:
+                entry["status"] = "scored" if row is not None else "awaiting_score"
+                entry["score"] = (row or {}).get("score")
+                entry["evaluated_at"] = (row or {}).get("evaluated")
+                entry["closed_at"] = datetime.now(timezone.utc).isoformat(
+                    timespec="seconds").replace("+00:00", "Z")
+                break
+        queue.write(state)
+        say("queue", f"closed id={item['id']} as {entry.get('status')}")
 
     if args.dry_run:
         report["outcome"] = "dry_run"
