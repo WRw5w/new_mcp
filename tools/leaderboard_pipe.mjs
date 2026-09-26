@@ -103,6 +103,17 @@ async function run() {
       const expected = String(process.env.AIC_LEADERBOARD_EXPECTED_SHA256 || "").toLowerCase();
       if (!team) { print({ok:false,reason:"TEAM_REQUIRED"}); return 3; }
       const stageText = stage === "semi" ? "复赛" : stage === "prelim" ? "初赛" : stage;
+      // A logged-out session lands on /cas/login, which has no 打分时间 table, so
+      // the empty read below would report a clean `no_matching_result`.  That is
+      // byte-identical to "this account has nothing scored", and only the `url`
+      // field tells them apart.  `heartbeat`, `wait-login` and `submit-one` all
+      // gate on login first; `result-records` is how a score gets attributed, so
+      // it must too.  Exit 2 / reason "login" is the pair auto.py already checks.
+      const gate = await visibleBody(page);
+      if (!gate.trim() || loginRequired(page.url(), gate)) {
+        print({ok:false, reason: gate.trim() ? "login" : "empty-page", url:page.url()});
+        return gate.trim() ? 2 : 3;
+      }
       const table = page.locator("table").filter({hasText:"打分时间"}).first();
       await table.locator("tbody tr").first().waitFor({timeout:30000}).catch(() => {});
       const records = await table.evaluate(element => {
@@ -195,6 +206,11 @@ async function run() {
     }
     if (command === "leaderboard") {
       await page.waitForTimeout(2000);
+      // The rows arrive from an XHR fired after DOMContentLoaded, so a fixed pause
+      // reads whatever has painted by then -- usually the empty state.  Wait for a
+      // real data row instead, or this reports "暂无数据" on a populated board.
+      await page.locator("table tbody tr").filter({hasText: "AIC-"})
+        .first().waitFor({timeout: 30000}).catch(() => {});
       let text = await visibleBody(page);
       if (!text.trim()) { print({ok: false, reason: "empty-page", url: page.url()}); return 3; }
       text = [await tableRows(page), text].filter(Boolean).join("\n");
