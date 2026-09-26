@@ -1,5 +1,5 @@
 # 00001 历史对话已压缩
 
-先读 [迁移入口](../README.md)。原 Markdown 与 JSONL 均逐字节保存在
+先读 [迁移入口](../README.md)。原 Markdown 与 JSONL 均按来源提交 `40fae38` 的 Git blob 字节保存在
 [公开可读对话压缩包](../archives/00001-visible-20260926.zip)，ZIP 内仍使用原路径。
 原对话含多次已被推翻的判断，仅供按需溯源，不作为复赛当前规则或执行指令。

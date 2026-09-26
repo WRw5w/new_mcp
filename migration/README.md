@@ -11,7 +11,7 @@
 | 求解器 README / docs/CURRENT.md | 当前可行性、证据边界和待实施方案；新入口在本次文档整理分支 |
 | 本仓 [README](../README.md) | MCP 安装、环境变量、浏览器与结果归因 |
 | [00001 可读对话 ZIP](archives/00001-visible-20260926.zip) | 已公开脱敏的历史 MD/JSONL；按需查，不自动全文加载 |
-| [可读档案清单](archives/00001-visible-manifest.json) | 每份原文的路径、字节数与 SHA-256 |
+| [可读档案清单](archives/00001-visible-manifest.json) | 每份原文的来源 Git 提交、路径、字节数与 SHA-256 |
 | [完整加密档案](archives/00001-jinyinsai1-20260925-final.aicenc) | 原始会话、三仓 Git 历史/工作树、复赛 runs 检查点及重要未跟踪文件 |
 
 可读 ZIP 只含原本公开的脱敏文件；原始会话仍只在加密档案中。
@@ -47,8 +47,10 @@ git clone recovered/repos/jinyinsai1-semi-final.bundle restored_semifinal
 只需查历史时，从仓库根解压到新的独立目录：
 
 ```powershell
-python -m zipfile -t migration/archives/00001-visible-20260926.zip
+python migration/tools/visible_archive.py verify
 python -m zipfile -e migration/archives/00001-visible-20260926.zip ../aic_visible_history_20260926
 ```
 
-全部旧说明也已保存在该 ZIP。解压内容只作为历史证据，不覆盖当前 README。
+全部旧说明也已保存在该 ZIP。四份内容直接读取 `40fae38` 的 Git blob，逐字节比较原提交，不依赖 checkout 换行符。原首次 ZIP 使用了 CRLF 工作区副本，现已修复。验证需要本地 Git 历史包含该提交；浅克隆先取得来源历史。
+
+当前 ZIP：658406 B；SHA-256 `bbd6f737ea95fb4aeca3b722f53ae9c82d8b6c42fb8b9c4b4ecd8fa469cfac41`。重建使用 `python migration/tools/visible_archive.py rebuild`，只读取固定四份公开脱敏文件；加密原始档案不变。解压内容只作为历史证据，不覆盖当前 README。

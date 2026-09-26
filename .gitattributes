@@ -1,0 +1,2 @@
+# Preserve evidence bytes. Archive builders must still read Git blobs directly.
+* -text
