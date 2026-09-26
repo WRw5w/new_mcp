@@ -1,0 +1,28 @@
+{
+  "format": 1,
+  "date": "2026-09-26",
+  "source_commit": "40fae38e1d90bb038ddb0d054a0af04cb100ad24",
+  "description": "Previously public redacted transcript and pre-rewrite guides only; no raw session, key or browser profile.",
+  "files": [
+    {
+      "path": "migration/conversation/00001_visible.md",
+      "bytes": 929447,
+      "sha256": "b63a0117df62aa4e402a83d227873dfd9a3ae448b8a053a7e501023161715007"
+    },
+    {
+      "path": "migration/conversation/00001_visible.jsonl",
+      "bytes": 975786,
+      "sha256": "aab09e1a0ccbe69da54e74bbddbcf54b6fbd802258f1a8c7d265d06b511e85ba"
+    },
+    {
+      "path": "migration/README.md",
+      "bytes": 3361,
+      "sha256": "0e16261114d93fbeb99ea13ce5123794018a56d472aba90cdeeab00cf94202db"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4247,
+      "sha256": "51f0f1b27a30efe67d3cb3c25ff176bb1a8c1bd1f64ac41294fe5fd21550ed1c"
+    }
+  ]
+}

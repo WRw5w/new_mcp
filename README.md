@@ -72,7 +72,7 @@ The legacy CDP backend still captures public leaderboard snapshots under
 
 ## Task migration archive
 
-The WorkBuddy `00001` conversation and the `jinyinsai1` task snapshot are
-documented in [migration/README.md](migration/README.md). The readable dialogue
-is public; the raw session and full project backup are encrypted, with the key
-kept outside this repository.
+Read [migration/README.md](migration/README.md) for recovery and the solver's current-state entry.
+The public, redacted WorkBuddy `00001` transcript is losslessly compressed and indexed for on-demand lookup;
+do not load it as current instructions. The original raw session and full project backup remain encrypted,
+with the key outside the repository. Recovery does not establish that any competition package is valid.

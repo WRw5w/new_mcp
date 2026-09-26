@@ -33,6 +33,23 @@ def add_file(z: zipfile.ZipFile, source: Path, name: str, manifest: list[dict]) 
     manifest.append({"path": name, "bytes": source.stat().st_size, "sha256": digest(source)})
 
 
+
+def add_visible_conversation(z: zipfile.ZipFile, here: Path, manifest: list[dict]) -> None:
+    """Use the verified historical transcript, never its short navigation stub."""
+    packed = here / "archives/00001-visible-20260926.zip"
+    member = "migration/conversation/00001_visible.md"
+    with zipfile.ZipFile(packed) as source:
+        index = json.loads(source.read("MANIFEST.json"))
+        record = next(item for item in index["files"] if item["path"] == member)
+        content = source.read(member)
+    sha = hashlib.sha256(content).hexdigest()
+    if len(content) != record["bytes"] or sha != record["sha256"]:
+        raise ValueError("Archived visible transcript failed integrity validation")
+    name = "conversation/00001_visible.md"
+    z.writestr(name, content)
+    manifest.append({"path": name, "bytes": len(content), "sha256": sha})
+
+
 def main() -> None:
     here = Path(__file__).resolve().parents[1]
     main_root = Path(r"D:\02_Projects\ML\jinyinsai1")
@@ -81,8 +98,7 @@ def main() -> None:
         add_file(archive, raw, f"conversation/{raw.name}", manifest)
         meta = raw.with_suffix(".meta.json")
         add_file(archive, meta, f"conversation/{meta.name}", manifest)
-        add_file(archive, here / "conversation/00001_visible.md",
-                 "conversation/00001_visible.md", manifest)
+        add_visible_conversation(archive, here, manifest)
         for source in local_main:
             add_file(archive, source, "local_changes/jinyinsai1/" +
                      source.relative_to(main_root).as_posix(), manifest)

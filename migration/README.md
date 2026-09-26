@@ -1,57 +1,54 @@
-# `00001` 与棒材任务迁移档案
+# 复赛迁移与历史档案
 
-这份档案对应 WorkBuddy 对话 `00001`（会话 ID
-`21624865-44ed-450b-a9b2-c650dec10933`）及 2026-09-25 的本机工作区快照。
-**先读本文件，再读 [可读对话](conversation/00001_visible.md)。** 对话是历史记录，
-其中的旧判断不能代替当前规则或平台反馈。
+更新 2026-09-26。**先看求解器当前状态，不要先读完整 00001 对话。**
+当前任务是 1 万单复赛，求解仓库为 [jinyinsai1 的 semi-final 分支](https://github.com/WRw5w/jinyinsai1/tree/semi-final)。
+求解器文档入口在 [codex/semifinal-knowledge-cleanup](https://github.com/WRw5w/jinyinsai1/tree/codex/semifinal-knowledge-cleanup)；本仓整理在 `codex/migration-archive-cleanup`。两者均为独立分支，默认分支不会自动采用新入口。
 
-本仓库是公开的，所以只公开经过处理的用户/助手可见对话。原始 WorkBuddy JSONL
-包含工具输入输出和疑似凭据，连同完整项目归档放在
-[`archives/00001-jinyinsai1-20260925-final.aicenc`](archives/00001-jinyinsai1-20260925-final.aicenc)
-中，以 AES-256-GCM 加密。**密钥不在 GitHub；必须单独保存和传输。**
-可读对话省略工具记录、内部提示和 4 张图片，不能直接导回 WorkBuddy。
+## 哪份资料解决什么问题
 
-## 完整归档包含
+| 资料 | 用途 |
+|---|---|
+| 求解器 README / docs/CURRENT.md | 当前可行性、证据边界和待实施方案；新入口在本次文档整理分支 |
+| 本仓 [README](../README.md) | MCP 安装、环境变量、浏览器与结果归因 |
+| [00001 可读对话 ZIP](archives/00001-visible-20260926.zip) | 已公开脱敏的历史 MD/JSONL；按需查，不自动全文加载 |
+| [可读档案清单](archives/00001-visible-manifest.json) | 每份原文的路径、字节数与 SHA-256 |
+| [完整加密档案](archives/00001-jinyinsai1-20260925-final.aicenc) | 原始会话、三仓 Git 历史/工作树、复赛 runs 检查点及重要未跟踪文件 |
 
-- `jinyinsai1` 的 Git 全历史与当前 `main` 工作树；本地 `main` 为 `40ffc33`，
-  另保留了本机 `origin/main` 的 `1b9f881` 引用。
-- `jinyinsai1_nolimit` 的 Git 全历史与当前 `semi-final` 工作树
-  `d22eee2`。这是对话后期实际工作的求解分支。
-- `auto_review` 的 Git 全历史与当前工作树；自动打榜 MCP 的独立版本就在
-  本 `new_mcp` 仓库中。
-- 原始 `00001` 会话 JSONL、元数据、可读对话、`jinyinsai1_nolimit/runs`
-  的全部 35 MiB 检查点，以及 `jinyinsai1` 中尚未入库的重要文件和
-  `runs/semi_full`。
-- `MANIFEST.json`：列出文件大小、SHA-256 和归档时的提交号。
+可读 ZIP 只含原本公开的脱敏文件；原始会话仍只在加密档案中。
+密钥独立保存、传输，不能写进仓库或档案摘要。本次没有更换加密档案和密钥。
 
-主工作区 `jinyinsai1/runs` 约 860 MiB，未装入 GitHub 归档；它是搜索中间产物。
-归档也不包含浏览器登录状态、Chrome profile、机器编译的 `.exe` 和无关的
-`aic_new_review`、`output/pdf` 项目。现有项目源码和交付包可由 Git bundle 恢复；
-大体量搜索输出需要按项目说明重新运行。
+## 新机器恢复顺序
 
-## 在新机器上解密与恢复
-
-把密钥文件**另行**带到新机器，然后在克隆的 `new_mcp` 目录执行：
+1. 克隆求解仓库 `semi-final` 和本 MCP 仓库，保留新机已有未提交修改。
+2. 单独取得密钥，解密至新文件、解压到空目录。
+3. 从 `repos/` 恢复需要的 Git bundle；源码快照停留在 9 月 25 日，须结合后续远端提交，不能覆盖新代码。
+4. 从 `run_state/jinyinsai1_nolimit/runs/` 恢复检查点；核对实际 chunks 和配置再决定是否续跑。
+5. 按本仓 README 建环境和配置完整赛道 URL；首次在专用 Chrome 登录。登录状态不在迁移包中。
 
 ```powershell
 python -m pip install -r migration/requirements.txt
-python migration/tools/secure_archive.py decrypt `
-  migration/archives/00001-jinyinsai1-20260925-final.aicenc `
-  full-migration.zip --key-file <密钥文件的绝对路径>
+python migration/tools/secure_archive.py decrypt migration/archives/00001-jinyinsai1-20260925-final.aicenc full-migration.zip --key-file <密钥文件绝对路径>
 Expand-Archive full-migration.zip -DestinationPath recovered
-git clone recovered/repos/jinyinsai1-semi-final.bundle jinyinsai1_nolimit
-git clone recovered/repos/jinyinsai1-main.bundle jinyinsai1
+git clone recovered/repos/jinyinsai1-semi-final.bundle restored_semifinal
 ```
 
-`recovered/worktrees/` 还放有各工作树的 ZIP，方便不需要 Git 历史时直接查看。
-`recovered/local_changes/jinyinsai1/` 保存主工作区未入库的重要文件；
-`recovered/run_state/jinyinsai1_nolimit/runs/` 保存可续跑检查点。
-原始会话在 `recovered/conversation/`。将其放回 WorkBuddy 内部目录能否让新机器的
-应用直接显示原对话，**尚未验证**；可读版和 JSONL 可作为接手代理的上下文。
+加密档案 SHA-256：`cf663fddcbd49df4c614762b88a2605e5b086241c2d0c04de6320801d1d0b24b`。
+解密 ZIP SHA-256：`772160f94061a0bf0a80b32063199f0765abf66492ce839ce0eff0eee16c5b0d`。
+包含 main `40ffc33`、复赛 `d22eee2`、auto_review `005fc45` 的历史；元数据详见解密后的 MANIFEST.json。
 
-解密后先读 `jinyinsai1_nolimit/MIGRATION.md` 与
-`diagnostics/clause6_OPEN_RISK_20260923.md`。后者指出条款 6 的更严格读法仍是
-未决风险；本地校验通过不足以证明平台会接受提交包。
+## 检查点和会话的边界
 
-加密文件 SHA-256：`cf663fddcbd49df4c614762b88a2605e5b086241c2d0c04de6320801d1d0b24b`。
-解密所得 ZIP SHA-256：`772160f94061a0bf0a80b32063199f0765abf66492ce839ce0eff0eee16c5b0d`。
+- 包含复赛约 35 MiB 检查点；不含主工作区约 860 MiB 的全部 runs，也不含浏览器 profile/凭据、机器编译的 exe 或无关项目。
+- 后续远端 `d597dd0` 记载迁移档案中的八岛已完成；旧对话“三岛未完成”不能直接触发重跑。以恢复文件为准。
+- `worktrees/` 是历史工作树快照；`local_changes/jinyinsai1/` 是主工作区的重要未入库文件；合入前比较差异。
+- 可读对话不是可导入的 WorkBuddy 会话；原始 JSONL 的 UI 导入也未验证。
+- “当时 loopback 不通”是历史诊断，不能推断所有机器都不能自动化；现行默认是 debugging pipe。
+
+只需查历史时，从仓库根解压到新的独立目录：
+
+```powershell
+python -m zipfile -t migration/archives/00001-visible-20260926.zip
+python -m zipfile -e migration/archives/00001-visible-20260926.zip ../aic_visible_history_20260926
+```
+
+全部旧说明也已保存在该 ZIP。解压内容只作为历史证据，不覆盖当前 README。

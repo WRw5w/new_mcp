@@ -17,3 +17,7 @@ cdp_probe_result.txt
 migration/private_build/
 migration/archives/*
 !migration/archives/*-final.aicenc
+
+# Deliberately public, previously redacted knowledge archive only.
+!migration/archives/00001-visible-20260926.zip
+!migration/archives/00001-visible-manifest.json
